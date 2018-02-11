@@ -8,6 +8,9 @@
 
 int main(int argc, char** argv)
 {
+	
+	char PLAIN_TEXT[] = "This is a top secret.";
+	
 	if(argc < 4){
 		printf("Not enough args\n");
 		return 1;
@@ -39,7 +42,11 @@ int main(int argc, char** argv)
 		for(;;) {
 			bytes_read = fread(indata, 1, AES_BLOCK_SIZE, ifp);
 			AES_cfb128_encrypt(indata, outdata, bytes_read, &key, iv, &num, AES_DECRYPT);
-			fprintf("%s",outdata);
+			printf("%s",outdata);
+			if(outdata == PLAIN_TEXT){
+				printf("FOUND IT! %s", line);
+				return 0;
+			}
 		  bytes_written = fwrite(outdata, 1, bytes_read, ofp);
 			if(bytes_read < AES_BLOCK_SIZE)
 				break;
