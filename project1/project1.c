@@ -8,11 +8,46 @@
 
 int main(int argc, char** argv)
 {
+	if(argc < 4){
+		printf("Not enough args\n");
+		return 1;
+	}
 	FILE *ifp = fopen(argv[1], "r");
 	FILE *ofp = fopen(argv[2], "w");
+	
+	char const* const fileName = argv[3];
+	FILE* file = fopen(fileName, "r");
+	char line[256];
 
-	int i = 0;
-	char dict[25144];
+	while(fgets(line, sizeof(line), file)){
+		printf("%s", line);
+		int bytes_read, bytes_written;
+		unsigned char indata[AES_BLOCK_SIZE];
+		unsigned char outdata[AES_BLOCK_SIZE];
+
+		char ckey[256];
+		strcpy(ckey, line);		
+		// = dict[k];
+		char iv[] = "dontusethisinput";
+
+		AES_KEY key;
+
+		AES_set_encrypt_key(ckey, 128, &key);
+
+		int num = 0;
+
+		for(;;) {
+			bytes_read = fread(indata, 1, AES_BLOCK_SIZE, ifp);
+			AES_cfb128_encrypt(indata, outdata, bytes_read, &key, iv, &num, AES_DECRYPT);
+			fprintf("%s",outdata);
+		  bytes_written = fwrite(outdata, 1, bytes_read, ofp);
+			if(bytes_read < AES_BLOCK_SIZE)
+				break;
+		}
+	}
+	
+	/*int i = 0;
+	char *dict[25144];
 	char line[25144];
 
 
@@ -22,13 +57,16 @@ int main(int argc, char** argv)
 		i++;
 	}
 	int k = 0;
-	for(k = 0; k < 25144; i++){
+	for(k = 0; k < sizeof(dict); k++){
+		//printf("Checking %i", k);
 		int bytes_read, bytes_written;
 		unsigned char indata[AES_BLOCK_SIZE];
 		unsigned char outdata[AES_BLOCK_SIZE];
 
-		unsigned char ckey[] = dict[k];
-		unsigned char iv[] = "dontusethisinput";
+		char ckey[16];
+		strcpy(ckey, dict[k]);		
+		// = dict[k];
+		char iv[] = "dontusethisinput";
 
 		AES_KEY key;
 
@@ -43,14 +81,15 @@ int main(int argc, char** argv)
 			if(bytes_read < AES_BLOCK_SIZE)
 				break;
 		}
-	}
+	}*/
 	
 	
 
 
-	fclose(dictionary);
+	//fclose(dictionary);
 	fclose(ifp);
 	fclose(ofp);
+	fclose(file);
 	return 1;
 }
 
