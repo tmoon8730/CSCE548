@@ -6,14 +6,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void pad(char *s, int length);
-int print_result(unsigned char *buf, char *s, int len, FILE *outFile, char *match);
-int strcicmp(char const *a, char const *b);
 
 int main(int argc, char** argv)
 {
-	unsigned char match[] = "Match";
-	unsigned char noMatch[] = "Not a match";
+
 	unsigned char iv[16] = {0}; // Given
 
 	char words[16], t; // Each word in the dictionary
@@ -36,6 +32,7 @@ int main(int argc, char** argv)
 		perror("Connot open file");
 		exit(1);
 	}
+
 
 
 	char pbuffer[1024];
@@ -90,32 +87,13 @@ int main(int argc, char** argv)
 		}
 		// If the value is 0 then it matches and the correct key was found
 		if(stringCheck == 0){
-			outputresult(outbuf, words, outlen, outFile, match);
-		}else{
-			outputresult(outbuf, words, outlen, outFile, noMatch);
+			int q,z;
+			for(q=0;q<strlen(words);q++)
+				fprintf(outFile,"%c",words[q]);
+			fprintf(outFile,"%c",'\n');
 		}
 	}
 	fclose(key);
 	fclose(outFile);
 	return 0;
-}
-
-// Print results to file output.txt
-int outputresult(unsigned char *buf, char *s, int len, FILE *outFile, char *match){
-	int i,n,j,k;
-	char x='\n';
-	char space=' ';
-	for(j=0;j<strlen(s);j++){
-		fprintf(outFile,"%c",s[j]);
-	}
-	fprintf(outFile,"%c",space);
-	for(i=0;i<len;i++){
-		fprintf(outFile,"%02x",buf[i]);
-	}
-	fprintf(outFile,"%c",space);
-	for(k=0;k<strlen(match);k++){
-		fprintf(outFile,"%c",match[k]);
-	}
-	fprintf(outFile,"%c",x);
-	return (0);
 }
